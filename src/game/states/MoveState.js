@@ -11,8 +11,7 @@ export class MoveState {
 
   update(player, deltaTime) {
     const moveDistance = player.speed * (deltaTime / 1000);
-    // Etapa 4: Lógica de Movimiento (movida aquí)
-    // Actualiza la dirección del jugador según las teclas presionadas
+    
     if (player.input.keys.ArrowUp) {
       player.y -= moveDistance;
       player.fila = 2;
@@ -27,13 +26,22 @@ export class MoveState {
       player.fila = 1;
     }
 
-    //Etapa 4: Si el jugador se sale de la pantalla, lo mantenemos dentro de los límites
+    // Etapa 7: LÓGICA DE ENCUENTRO
+    // Solo si el jugador está en la zona de pasto
+    if (player.isInsideZone) {
+        // Cada vez que se mueve, hay una pequeña probabilidad de encuentro
+        const encounterChance = 0.02; // Un 2% de probabilidad en cada frame de movimiento
+        if (Math.random() < encounterChance) {
+            console.log("¡BATALLA POKÉMON! (Prueba de probabilidad exitosa)");
+            // Aquí es donde más tarde llamaremos a la función para cambiar de escena.
+        }
+    }
+    
     if (player.x < 0) player.x = 0;
     if (player.x + player.width > 640) player.x = 640 - player.width;
     if (player.y < 0) player.y = 0;
     if (player.y + player.height > 480) player.y = 480 - player.height;
-
-    // Etapa 4: Lógica de Animación (movida aquí)
+    
     player.frameTimer += deltaTime;
     if (player.frameTimer > player.frameInterval) {
       player.frameTimer = 0;
