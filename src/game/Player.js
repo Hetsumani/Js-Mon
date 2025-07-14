@@ -21,10 +21,8 @@ export class Player {
     this.frameInterval = 100;
 
     this.currentState.enter(this);
-    
-    this.isInsideZone = false;
 
-    // Etapa 8: Guardamos la función de combate
+    this.isInsideZone = false;
     this.onEnterCombat = onEnterCombat;
   }
 
@@ -42,16 +40,17 @@ export class Player {
     if (this.currentState.update) {
       this.currentState.update(this, deltaTime);
     }
-    // Etapa 6: Collision Detection Logic
-    const wasInside = this.isInsideZone; // Guarda el estado anterior
-    this.isInsideZone = this.checkCollision(collisionZone); // Calcula el estado actual
 
-    // Compara el estado anterior con el actual para detectar cambios
-    if (this.isInsideZone && !wasInside) {
-      console.log("¡El jugador HA ENTRADO en la zona!");
-    } else if (!this.isInsideZone && wasInside) {
-      console.log("¡El jugador HA SALIDO de la zona!");
+    // Etapa 9: LÓGICA DE ENCUENTRO CORREGIDA
+    // Solo se activa si el jugador está en la zona Y en estado de movimiento.
+    if (this.isInsideZone && this.currentState.name === "MOVE") {
+      const encounterChance = 0.01; // Reducimos la probabilidad
+      if (Math.random() < encounterChance) {
+        this.onEnterCombat();
+      }
     }
+
+    this.isInsideZone = this.checkCollision(collisionZone);
   }
 
   draw(context) {
@@ -67,9 +66,7 @@ export class Player {
       this.height
     );
   }
-
-  // Etapa 6: Método de colisión AABB
-  // Devuelve 'true' si el jugador (this) colisiona con el otro objeto (other).
+  
   checkCollision(other) {
     return (
       this.x < other.x + other.width &&

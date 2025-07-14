@@ -26,14 +26,7 @@ export class MoveState {
       player.fila = 1;
     }
 
-    
-    if (player.isInsideZone) {        
-        const encounterChance = 0.02; // Un 2% de probabilidad en cada frame de movimiento
-        if (Math.random() < encounterChance) {
-            // Etapa 8: En lugar del console.log, llamamos a la función
-            player.onEnterCombat();
-        }
-    }
+    // Etapa 9: La lógica de encuentro ya NO va aquí.    
     
     if (player.x < 0) player.x = 0;
     if (player.x + player.width > 640) player.x = 640 - player.width;
