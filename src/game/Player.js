@@ -1,55 +1,69 @@
-import { IdleState } from './states/IdleState.js';
+import { IdleState } from "./states/IdleState.js";
 
 export class Player {
-    constructor(image, input) {
-        this.x = 100;
-        this.y = 100;
-        this.image = image; // Guardamos la imagen del jugador
-        this.width = 30; // Ancho del sprite
-        this.height = 35; // Alto del sprite
-        this.input = input; // Guardamos la referencia al objeto de entrada
-        this.columna = 0; // Columna del sprite
-        this.fila = 0; // Fila del sprite
-        this.spriteWidth = 30; // Ancho del sprite
-        this.spriteHeight = 35; // Alto del sprite
-        // El jugador empieza en el estado IDLE
-        this.currentState = new IdleState();
-        this.currentState.enter();
+  constructor(image, input) {
+    this.x = 100;
+    this.y = 100;
+    this.image = image;
+    this.input = input;
+    this.width = 30;
+    this.height = 35;
+    this.spriteWidth = 30;
+    this.spriteHeight = 35;
+    this.columna = 0;
+    this.fila = 0;
+    this.currentState = new IdleState();
+
+    // Etapa 3: La velocidad ahora se define en píxeles por segundo
+    this.speed = 200; 
+
+    this.maxFrame = 3;
+    this.frameTimer = 0;
+    this.frameInterval = 100;
+    
+    this.currentState.enter();
+  }
+
+  setState(newState) {
+    this.currentState = newState;
+    this.currentState.enter();
+  }
+
+  update(deltaTime) {
+    // 1. Revisa si hay que cambiar de estado
+    const newState = this.currentState.handleInput(this.input);
+    if (newState) {
+      this.setState(newState);
     }
 
-    // Método para cambiar de estado de forma segura
-    setState(newState) {
-        this.currentState = newState;
-        this.currentState.enter();
+    // 2. Pasa el deltaTime al update del estado actual (MOVE o IDLE)
+    if (this.currentState.update) {
+      this.currentState.update(this, deltaTime);
     }
 
-    update(input) {
-        // 1. Delega el manejo de input al estado actual
-        const newState = this.currentState.handleInput(input);
-        
-        // 2. Si el estado retornó un nuevo estado, lo cambiamos
-        if (newState) {
-            this.setState(newState);
-        }
-        
-        if (this.currentState.update) {
-            // 3. Si el estado actual tiene un método update, lo llamamos
-            this.currentState.update(this);
-        }
+    // 3. Actualiza la animación del sprite
+    this.frameTimer += deltaTime;
+    if (this.frameTimer > this.frameInterval) {
+      this.frameTimer = 0;
+      if (this.columna < this.maxFrame) {
+        this.columna++;
+      } else {
+        this.columna = 0;
+      }
     }
+  }
 
-    // Método para que el jugador se dibuje a sí mismo
-    draw(context) {
-        context.drawImage(
-            this.image,
-            this.columna * this.spriteWidth,
-            this.fila * this.spriteHeight,
-            this.spriteWidth,
-            this.spriteHeight,
-            this.x,
-            this.y,
-            this.width,
-            this.height
-        );
-    }
+  draw(context) {
+    context.drawImage(
+      this.image,
+      this.columna * this.spriteWidth,
+      this.fila * this.spriteHeight,
+      this.spriteWidth,
+      this.spriteHeight,
+      this.x,
+      this.y,
+      this.width,
+      this.height
+    );
+  }
 }
