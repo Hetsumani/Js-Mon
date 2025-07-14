@@ -5,13 +5,10 @@ export class IdleState {
         this.name = 'IDLE';
     }
 
-    enter() {
+    enter(player) {
         console.log("Entrando en estado IDLE");
-    }
-
-    update(player, deltaTime) {
         player.columna = 0; // Resetea la columna del sprite a 0 para el estado idle
-    }
+    }    
 
     handleInput(input) {
         // Si se detecta movimiento, cambia al estado MOVE

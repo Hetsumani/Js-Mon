@@ -13,45 +13,37 @@ export class Player {
     this.columna = 0;
     this.fila = 0;
     this.currentState = new IdleState();
-
-    // Etapa 3: La velocidad ahora se define en píxeles por segundo
+        
     this.speed = 200; 
 
     this.maxFrame = 3;
     this.frameTimer = 0;
     this.frameInterval = 100;
     
-    this.currentState.enter();
+    this.currentState.enter(this);
   }
 
   setState(newState) {
     this.currentState = newState;
-    this.currentState.enter();
+    // etapa 4: Pasamos la instancia del jugador ('this') al entrar al nuevo estado.
+    this.currentState.enter(this);
   }
 
+  // Etapa 4: Cambiamos el método update para que
+  // ya no se encargue de la animación y lo hagan los estados.
   update(deltaTime) {
     // 1. Revisa si hay que cambiar de estado
     const newState = this.currentState.handleInput(this.input);
     if (newState) {
-      this.setState(newState);
+        this.setState(newState);
     }
 
-    // 2. Pasa el deltaTime al update del estado actual (MOVE o IDLE)
+    // 2. ¡Simplificado! Solo delega el update al estado actual.
+    // La animación y el movimiento ahora son responsabilidad de cada estado.
     if (this.currentState.update) {
-      this.currentState.update(this, deltaTime);
+        this.currentState.update(this, deltaTime);
     }
-
-    // 3. Actualiza la animación del sprite
-    this.frameTimer += deltaTime;
-    if (this.frameTimer > this.frameInterval) {
-      this.frameTimer = 0;
-      if (this.columna < this.maxFrame) {
-        this.columna++;
-      } else {
-        this.columna = 0;
-      }
-    }
-  }
+}
 
   draw(context) {
     context.drawImage(
