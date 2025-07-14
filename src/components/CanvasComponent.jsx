@@ -17,8 +17,6 @@ const CanvasComponent = () => {
     const context = canvas.getContext("2d");
     let animationFrameId;
 
-    // Etapa 5: Carga de Assets
-    // Helper para cargar una imagen y devolver una promesa
     const loadImage = (src) => {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -28,11 +26,20 @@ const CanvasComponent = () => {
       });
     };
 
+    // Etapa 6: Esta variable guardará el objeto de la zona una vez cargado el mapa
+    let collisionZone = null;
+
     // Usa Promise.all para esperar a que todas las imágenes carguen
     Promise.all([loadImage(tilesetImageSrc), loadImage(jugadorSprite)]).then(
       ([tilesetImage, playerImage]) => {
         // Cuando todo ha cargado, inicializa el juego
         const input = new InputHandler();
+        // Etapa 6: Crea el mapa y obtiene la zona de colisión
+        const map = new TileMap(mapData, tilesetImage); // Crea el mapa primero
+        // Llama al nuevo método para obtener el objeto de la capa
+        // Como no le pusiste nombre en Tiled, obtenemos el primer objeto (índice 0).
+        collisionZone = map.getObject("Pasto-Detectar");
+
         gameRef.current = {
           map: new TileMap(mapData, tilesetImage),
           player: new Player(playerImage, input),
@@ -41,7 +48,7 @@ const CanvasComponent = () => {
         requestAnimationFrame(gameLoop);
       }
     );
-    
+
     const gameLoop = (timestamp) => {
       if (!gameRef.current) return;
 
@@ -50,8 +57,8 @@ const CanvasComponent = () => {
 
       const { map, player } = gameRef.current;
 
-      // 1. Actualiza la lógica del jugador
-      player.update(deltaTime);
+      // Etapa 6: Actualiza el jugador y verifica colisiones
+      player.update(deltaTime, collisionZone);
 
       // 2. Dibuja todo en orden
       context.clearRect(0, 0, canvas.width, canvas.height);

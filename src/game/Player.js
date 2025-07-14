@@ -13,37 +13,44 @@ export class Player {
     this.columna = 0;
     this.fila = 0;
     this.currentState = new IdleState();
-        
-    this.speed = 200; 
+
+    this.speed = 200;
 
     this.maxFrame = 3;
     this.frameTimer = 0;
     this.frameInterval = 100;
-    
+
     this.currentState.enter(this);
+
+    // Etapa 6: Propiedad para rastrear el estado de la colisión
+    this.isInsideZone = false;
   }
 
   setState(newState) {
     this.currentState = newState;
-    // etapa 4: Pasamos la instancia del jugador ('this') al entrar al nuevo estado.
     this.currentState.enter(this);
   }
 
-  // Etapa 4: Cambiamos el método update para que
-  // ya no se encargue de la animación y lo hagan los estados.
-  update(deltaTime) {
-    // 1. Revisa si hay que cambiar de estado
+  update(deltaTime, collisionZone) {
     const newState = this.currentState.handleInput(this.input);
     if (newState) {
-        this.setState(newState);
+      this.setState(newState);
     }
 
-    // 2. ¡Simplificado! Solo delega el update al estado actual.
-    // La animación y el movimiento ahora son responsabilidad de cada estado.
     if (this.currentState.update) {
-        this.currentState.update(this, deltaTime);
+      this.currentState.update(this, deltaTime);
     }
-}
+    // Etapa 6: Collision Detection Logic
+    const wasInside = this.isInsideZone; // Guarda el estado anterior
+    this.isInsideZone = this.checkCollision(collisionZone); // Calcula el estado actual
+
+    // Compara el estado anterior con el actual para detectar cambios
+    if (this.isInsideZone && !wasInside) {
+      console.log("¡El jugador HA ENTRADO en la zona!");
+    } else if (!this.isInsideZone && wasInside) {
+      console.log("¡El jugador HA SALIDO de la zona!");
+    }
+  }
 
   draw(context) {
     context.drawImage(
@@ -56,6 +63,17 @@ export class Player {
       this.y,
       this.width,
       this.height
+    );
+  }
+
+  // Etapa 6: Método de colisión AABB
+  // Devuelve 'true' si el jugador (this) colisiona con el otro objeto (other).
+  checkCollision(other) {
+    return (
+      this.x < other.x + other.width &&
+      this.x + this.width > other.x &&
+      this.y < other.y + other.height &&
+      this.y + this.height > other.y
     );
   }
 }

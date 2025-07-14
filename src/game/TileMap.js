@@ -13,6 +13,15 @@ export class TileMap {
         this.tilesetCols = Math.floor(this.tileset.width / this.tileWidth);
     }
 
+    // Etapa 6: Método para obtener un objeto por su nombre desde una capa de objetos
+    getObject(layerName, objectName) {
+        const layer = this.mapData.layers.find(l => l.name === layerName && l.type === 'objectgroup');
+        if (!layer) return null;
+        // Si no se especifica un nombre, devuelve el primer objeto de la capa
+        if (!objectName) return layer.objects[0];
+        return layer.objects.find(obj => obj.name === objectName);
+    }
+
     draw(context) {
         // Itera sobre cada capa del mapa
         this.mapData.layers.forEach(layer => {
