@@ -7,7 +7,7 @@ import mapData from "../assets/mapa/mapa.json"; // Importa los datos del mapa
 import tilesetImageSrc from "../assets/tiles/basictiles.png";
 import jugadorSprite from "../assets/sprites/RED_v03.png";
 
-const CanvasComponent = () => {
+const OverworldComponent = ({ onEnterCombat }) => {
   const canvasRef = useRef(null);
   const gameRef = useRef(null);
   const lastTimeRef = useRef(0);
@@ -26,25 +26,17 @@ const CanvasComponent = () => {
       });
     };
 
-    // Etapa 6: Esta variable guardará el objeto de la zona una vez cargado el mapa
     let collisionZone = null;
 
-    // Usa Promise.all para esperar a que todas las imágenes carguen
     Promise.all([loadImage(tilesetImageSrc), loadImage(jugadorSprite)]).then(
       ([tilesetImage, playerImage]) => {
-        // Cuando todo ha cargado, inicializa el juego
         const input = new InputHandler();
-        // Etapa 6: Crea el mapa y obtiene la zona de colisión
-        const map = new TileMap(mapData, tilesetImage); // Crea el mapa primero
-        // Llama al nuevo método para obtener el objeto de la capa
-        // Como no le pusiste nombre en Tiled, obtenemos el primer objeto (índice 0).
+        const map = new TileMap(mapData, tilesetImage);
+        // Etapa 8: Le pasamos la función 'onEnterCombat' al jugador
+        const player = new Player(playerImage, input, onEnterCombat);
         collisionZone = map.getObject("Pasto-Detectar");
 
-        gameRef.current = {
-          map: new TileMap(mapData, tilesetImage),
-          player: new Player(playerImage, input),
-          input: input,
-        };
+        gameRef.current = { map, player, input };
         requestAnimationFrame(gameLoop);
       }
     );
@@ -57,13 +49,11 @@ const CanvasComponent = () => {
 
       const { map, player } = gameRef.current;
 
-      // Etapa 6: Actualiza el jugador y verifica colisiones
       player.update(deltaTime, collisionZone);
 
-      // 2. Dibuja todo en orden
       context.clearRect(0, 0, canvas.width, canvas.height);
-      map.draw(context); // Primero el mapa
-      player.draw(context); // Luego el jugador, encima del mapa
+      map.draw(context);
+      player.draw(context); 
 
       animationFrameId = requestAnimationFrame(gameLoop);
     };
@@ -86,4 +76,4 @@ const CanvasComponent = () => {
   );
 };
 
-export default CanvasComponent;
+export default OverworldComponent;

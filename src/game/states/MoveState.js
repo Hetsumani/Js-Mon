@@ -26,14 +26,12 @@ export class MoveState {
       player.fila = 1;
     }
 
-    // Etapa 7: LÓGICA DE ENCUENTRO
-    // Solo si el jugador está en la zona de pasto
-    if (player.isInsideZone) {
-        // Cada vez que se mueve, hay una pequeña probabilidad de encuentro
+    
+    if (player.isInsideZone) {        
         const encounterChance = 0.02; // Un 2% de probabilidad en cada frame de movimiento
         if (Math.random() < encounterChance) {
-            console.log("¡BATALLA POKÉMON! (Prueba de probabilidad exitosa)");
-            // Aquí es donde más tarde llamaremos a la función para cambiar de escena.
+            // Etapa 8: En lugar del console.log, llamamos a la función
+            player.onEnterCombat();
         }
     }
     

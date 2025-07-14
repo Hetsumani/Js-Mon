@@ -1,7 +1,7 @@
 import { IdleState } from "./states/IdleState.js";
 
 export class Player {
-  constructor(image, input) {
+  constructor(image, input, onEnterCombat) {
     this.x = 100;
     this.y = 100;
     this.image = image;
@@ -21,9 +21,11 @@ export class Player {
     this.frameInterval = 100;
 
     this.currentState.enter(this);
-
-    // Etapa 6: Propiedad para rastrear el estado de la colisión
+    
     this.isInsideZone = false;
+
+    // Etapa 8: Guardamos la función de combate
+    this.onEnterCombat = onEnterCombat;
   }
 
   setState(newState) {
